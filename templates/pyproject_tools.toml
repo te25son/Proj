@@ -1,0 +1,50 @@
+[tool.mypy]
+strict = true
+disallow_untyped_decorators = false
+disallow_subclassing_any = false
+warn_return_any = false
+warn_unused_ignores = false
+ignore_missing_imports = true
+
+[tool.ruff]
+exclude = ["__init__.py"]
+fix = true
+ignore = ["E731", "B008"]
+line-length = 120
+select = [
+    "C",
+    "F", # Pyflakes
+    "I", # Isort
+    "W", # Warning
+    "B", # Flake8-Bugbear
+    # Ignore until Fastapi can be used with ruff TCH
+    # "TCH", # Flake8-Type-Checking
+    "PIE", # Flake8-Pie
+    "T20", # Flake8-Print
+    "RET", # Flake8-Return
+    "RUF", # Ruff-Specfic
+]
+
+[tool.ruff.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 5.
+max-complexity = 5
+
+[tool.ruff.isort]
+required-imports = ["from __future__ import annotations"]
+order-by-type = true
+force-single-line = false
+known-first-party = ["swole_v2", "cli", "tests"]
+
+[tool.black]
+line-length = 120
+
+# Ignore until Fastapi can be used with ruff TCH
+# [tool.ruff.flake8-type-checking]
+# strict = true
+# runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+
+[tool.flake8]
+ignore = ["E501"]
+enable-extensions = ["TC", "TC1"]
+type-checking-fastapi-enabled = true
+type-checking-pydantic-enabled = true

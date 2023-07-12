@@ -1,0 +1,54 @@
+_default:
+    just fix "all"
+    just check "all"
+
+locations := "./{{project_name}} ./tests"
+
+[private]
+alias f := fix
+[private]
+alias c := check
+[private]
+alias h := help
+
+# Show all available recipes
+help:
+    @just --list --list-prefix "···· "
+
+# Setup the current project
+setup:
+    poetry run just
+
+# Run linter and formatter (only run pre-commit if argument is "all")
+fix *arg: (lint) (format)
+    @if [ '{{ arg }}' = 'all' ]; then \
+        just _pre-commit "end-of-file-fixer" "trailing-whitespace" "pretty-format-json" "poetry-lock" "sync_with_poetry"; \
+    fi
+
+# Run lint, format, and type checks (only run pre-commit if argument is "all")
+check *arg: (lint "--exit-non-zero-on-fix") (format "--check") (type-check)
+    flake8 {{ locations }}
+    @if [ '{{ arg }}' = 'all' ]; then \
+        just _pre-commit "check-toml" "check-yaml" "check-json" "poetry-check"; \
+    fi
+
+# Run linter on locations with optional arguments
+lint *args:
+    ruff {{ locations }} {{ args }}
+
+# Run formatter on locations with optional arguments
+format *args:
+    black {{ locations }} {{ args }}
+
+# Run type checker on locations with optional arguments
+type-check *args:
+    mypy {{ locations }} {{ args }}
+
+_pre-commit +hooks:
+    @for hook in {{ hooks }}; do \
+        pre-commit run $hook --all-files; \
+    done;
+
+# Run all pre-commit hooks on all files
+pre-commit-all:
+    pre-commit run --all-files
